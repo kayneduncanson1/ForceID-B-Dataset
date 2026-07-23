@@ -56,10 +56,11 @@ def extract_base_metadata_fib(metadata_arr):
     return id_labels, ids, counts_trials_by_id, indices_where_id_changes, ids_sessions_trials, metadata_by_id
 
 
-# For a given dataset specified by the string identifier 'dataset_name', load the arrays that were defined and saved in
-# data_processing.py representing basic metadata extracted from the metadata spreadsheet. This function is similar to
-# the 'get_base_metadata' function in the ForceID-Study-2 repo except for the function name and the capital 'O' for the
-# 'Objects' subdirectories:
+# For a given dataset specified by the string identifier 'dataset_name', load the arrays with basic metadata that were
+# defined and saved in the relevant data processing script ('prepare_[dataset].py' in 'ForceID-Study-2' for the
+# benchmark datasets and 'data_processing.py' in this repo for ForceID-B_RS). This function is the same as the
+# 'get_base_metadata' function in the ForceID-Study-2 repo except for the function name and the capital 'O' for the
+# 'Objects' subdirectory:
 def load_base_metadata(dataset_name):
 
     # Trial name identifiers:
@@ -76,11 +77,10 @@ def load_base_metadata(dataset_name):
     return trial_names, labels, ids, counts_samples
 
 
-# For a given dataset specified by the string identifier 'dataset_name', load the metadata arrays that were defined and
-# saved in the respective data pre-processing script in the ForceID-Study_2 repo, named 'prepare_[dataset].py'
-# (Duncanson et al., 2024). This function is similar to the 'get_full_metadata' function in the ForceID-Study-2 repo
-# except for the function name, the capital 'O' for the 'Objects' subdirectories and the order in which the demographic
-# variables are returned:
+# For a given benchmark dataset specified by the string identifier 'dataset_name', load the metadata arrays that were
+# defined and saved in data processing scripts in the ForceID-Study-2 repo ('prepare_[dataset].py'). This function is
+# the same as the 'get_full_metadata' function in the ForceID-Study-2 repo except for the function name, the capital
+# 'O' for the 'Objects' subdirectories and the order in which the demographic variables are returned:
 def load_full_metadata(dataset_name):
 
     # Trial name identifiers:

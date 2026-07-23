@@ -14,7 +14,6 @@ metadata = pd.read_csv('./Datasets/fi-b-all/Spreadsheets/Metadata.csv', usecols=
 fc_locs_fp1 = metadata[:, 27]
 fc_locs_fp2 = metadata[:, 31]
 fc_locs_fp3 = metadata[:, 35]
-# foot_contacts = metadata[:, 17:23]
 
 # If the entry for one force platform field was nan, then the entry for the other force platform fields was also nan.
 # In other words, the same non-nan indices apply to all force platform fields:

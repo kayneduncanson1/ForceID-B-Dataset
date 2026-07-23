@@ -191,7 +191,8 @@ if gaitrec_to_plot == 'gr-sho':
 
     for idx_id in range(ages_bm[1].shape[0]):
 
-        # Exclude participants who did not walk shod (indices obtained from 'S02_prepro_gr.py' in ForceID-Study-2 repo):
+        # Exclude participants who did not walk shod (indices obtained from 'prepare_gaitrec.py' in the
+        # ForceID-Study-2 repository):
         if idx_id not in [92, 95, 131]:
 
             ages_gr_sho.append(ages_bm[1][idx_id])
