@@ -79,7 +79,7 @@ mpl.rcParams['mathtext.default'] = 'regular'
 sigs_bm_r = [] # r = right stance.
 sigs_bm_l = [] # l = left stance.
 
-for dataset in ['ai-all', 'gb-all', 'gr-all', 'fi-all']: # (Nomenclature from ForceID-Study-2 repo.)
+for dataset in ['ai-all', 'gb-all', 'gr-all', 'fi-all']: # Nomenclature from ForceID-Study-2 repo [2].
 
     sigs_bm_r.append(np.load('./Datasets/%s/Objects/sigs_pro_r.npy' % dataset, allow_pickle=True))
     sigs_bm_l.append(np.load('./Datasets/%s/Objects/sigs_pro_l.npy' % dataset, allow_pickle=True))

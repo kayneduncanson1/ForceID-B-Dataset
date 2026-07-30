@@ -1,13 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="dd16f67a-7b80-4d90-9016-ade80575cf34" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.name" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/ForceID-B-Dataset.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/ForceID-B-Dataset.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/STOP.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Scripts/data_acquisition_GUI.py" beforeDir="false" afterPath="$PROJECT_DIR$/Scripts/data_acquisition_GUI.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Scripts/data_analysis.py" beforeDir="false" afterPath="$PROJECT_DIR$/Scripts/data_analysis.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Scripts/data_processing.py" beforeDir="false" afterPath="$PROJECT_DIR$/Scripts/data_processing.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Scripts/fig_demographics.py" beforeDir="false" afterPath="$PROJECT_DIR$/Scripts/fig_demographics.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Scripts/fig_foot_contacts.py" beforeDir="false" afterPath="$PROJECT_DIR$/Scripts/fig_foot_contacts.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Scripts/fig_sigs.py" beforeDir="false" afterPath="$PROJECT_DIR$/Scripts/fig_sigs.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TrainEval/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/TrainEval/__init__.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Utils/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/Utils/__init__.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -18,6 +24,17 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
   <component name="ProjectId" id="3Gsdng2DqM3lWR0myLIuRpYkSy1" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -27,7 +44,11 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../ForceID-Study-1" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -38,10 +59,27 @@
       <option name="presentableId" value="Default" />
       <updated>1784764378545</updated>
       <workItem from="1784764379791" duration="338000" />
+      <workItem from="1784801025678" duration="851000" />
+      <workItem from="1784862342386" duration="12467000" />
+      <workItem from="1784932152086" duration="3085000" />
+      <workItem from="1785194404642" duration="8461000" />
+      <workItem from="1785278203985" duration="19716000" />
+      <workItem from="1785367262450" duration="18750000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
 </project>

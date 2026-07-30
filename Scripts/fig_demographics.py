@@ -109,7 +109,8 @@ percent_male_fib = (count_males_fib / sexes_fib.shape[0]) * 100
 # # SECTION 3. GET DEMOGRAPHIC METADATA FOR THE BENCHMARK DATASETS - START
 # # -------------------------------------------------------------------------------------------------------------------
 # This method differs to that applied above to get demographic metadata for ForceID-B due to minor differences in
-# metadata spreadsheet format. This method is re-purposed from the ForceID-Study-2 repo by Duncanson et al. (2024):
+# metadata spreadsheet format. This method is re-purposed from the ForceID-Study-2 repo for
+# Duncanson et al. (2024) [2,3]:
 ages_bm = [] # bm = benchmark.
 sexes_bm = []
 masses_bm = []
@@ -192,7 +193,7 @@ if gaitrec_to_plot == 'gr-sho':
     for idx_id in range(ages_bm[1].shape[0]):
 
         # Exclude participants who did not walk shod (indices obtained from 'prepare_gaitrec.py' in the
-        # ForceID-Study-2 repository):
+        # ForceID-Study-2 repository [2]):
         if idx_id not in [92, 95, 131]:
 
             ages_gr_sho.append(ages_bm[1][idx_id])

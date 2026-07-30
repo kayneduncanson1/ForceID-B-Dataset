@@ -3,9 +3,7 @@ import torch
 from Losses import get_dists
 
 
-# Class from Zhou & Xiang (2019).
-# Torchreid: A Library for Deep Learning Person Re-Identification in Pytorch:
-# https://kaiyangzhou.github.io/deep-person-reid/_modules/torchreid/utils/avgmeter.html#AverageMeter
+# Class from Zhou & Xiang (2019) [5].
 class AverageMeter(object):
 
     def __init__(self):
@@ -24,9 +22,7 @@ class AverageMeter(object):
         self.avg = self.sum / self.count
 
 
-# Class from Rath (2021).
-# Using Learning Rate Scheduler and Early Stopping with PyTorch:
-# https://debuggercafe.com/using-learning-rate-scheduler-and-early-stopping-with-pytorch/
+# Class from Rath (2021) [6].
 class EarlyStopping():
     """
     Early stopping to stop the training when the loss does not improve after

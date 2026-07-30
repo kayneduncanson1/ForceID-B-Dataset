@@ -13,8 +13,7 @@ def convert_dt_to_iso(dt_str):
     return dt.strftime("%Y-%m-%dT%H:%M:%S")
 
 
-# Function from Maheshkar, S. (September 9, 2024). How to Set Random Seeds in PyTorch and Tensorflow.
-# https://wandb.ai/sauravmaheshkar/RSNA-MICCAI/reports/How-to-Set-Random-Seeds-in-PyTorch-and-Tensorflow--VmlldzoxMDA2MDQy
+# Function from Maheshkar (2024) [7].
 def set_seed(seed=42):
     np.random.seed(seed)
     random.seed(seed)
@@ -58,9 +57,9 @@ def extract_base_metadata_fib(metadata_arr):
 
 # For a given dataset specified by the string identifier 'dataset_name', load the arrays with basic metadata that were
 # defined and saved in the relevant data processing script ('prepare_[dataset].py' in 'ForceID-Study-2' for the
-# benchmark datasets and 'data_processing.py' in this repo for ForceID-B_RS). This function is the same as the
+# benchmark datasets and 'data_processing.py' in this repo for ForceID-B_RS) [2]. This function is the same as the
 # 'get_base_metadata' function in the ForceID-Study-2 repo except for the function name and the capital 'O' for the
-# 'Objects' subdirectory:
+# 'Objects' subdirectory [2]:
 def load_base_metadata(dataset_name):
 
     # Trial name identifiers:
@@ -78,9 +77,9 @@ def load_base_metadata(dataset_name):
 
 
 # For a given benchmark dataset specified by the string identifier 'dataset_name', load the metadata arrays that were
-# defined and saved in data processing scripts in the ForceID-Study-2 repo ('prepare_[dataset].py'). This function is
-# the same as the 'get_full_metadata' function in the ForceID-Study-2 repo except for the function name, the capital
-# 'O' for the 'Objects' subdirectories and the order in which the demographic variables are returned:
+# defined and saved in data processing scripts in the ForceID-Study-2 repo ('prepare_[dataset].py') [2]. This function
+# is the same as the 'get_full_metadata' function in the ForceID-Study-2 repo except for the function name, the capital
+# 'O' for the 'Objects' subdirectories and the order in which the demographic variables are returned [2]:
 def load_full_metadata(dataset_name):
 
     # Trial name identifiers:

@@ -9,14 +9,14 @@ from PrePro import butterworth_lowpass
 from Utils import set_seed, extract_base_metadata_fib
 
 """This script defines and processes two subsets of ForceID-B:
-1) The ForceID-B_CFC subset contains samples of the GRF and COP during the first two consecutive stance phases from
-complete foot contacts ('CFC') in trials with at least two consecutive complete foot contacts. In fig_sigs.py, this
-subset is visualised against another subset of ForceID-B containing partial foot contacts from two random IDs, as well
-as four previous large-scale walking GRF datasets referred herein as benchmark datasets: AIST, Gutenberg, GaitRec and
-ForceID-A.
-2) The ForceID-B_RS subset contains two random samples ('RS') from each of the participants in ForceID-B_CFC with at
-least two samples. This subset is used in data_analysis.py, where it is 'pre-processed' further for Machine Learning
-(ML) and then applied for ML experiments as part of the technical validation."""
+1) The ForceID-B_CFC subset contains trials with at least two complete foot contacts ('CFC'), wherein a sample was
+defined as the sequence of GRF and COP measurements over the first two complete foot contacts (i.e., complete gait
+cycle). In fig_sigs.py, this subset is visualised against another subset of ForceID-B containing partial foot contacts
+from two random IDs, as well as four previous large-scale walking GRF datasets referred herein as benchmark datasets:
+AIST, Gutenberg, GaitRec and ForceID-A.
+2) The ForceID-B_RS subset contains two random samples ('RS') from each participant in ForceID-B_CFC with at least two
+samples. This subset is used in data_analysis.py, where it is 'pre-processed' further for Machine Learning (ML) and then
+applied for ML experiments as part of the technical validation."""
 
 # # -------------------------------------------------------------------------------------------------------------------
 # # SECTION 1. INITIALISE PARAMETERS - START
@@ -86,8 +86,8 @@ len_interp = 100
 
 # We show how to detect the stance side using a simple heuristic based on the left-to-right GRF. Namely, the data are
 # assigned a stance side according to whether this directional component is positive or negative at a specified
-# percentage of the stance phase. We experimented with values around 35(%) based on preliminary unpublished work that
-# contributed to Duncanson et al. (2021). Stance side variables are denoted 'ss':
+# percentage of the stance phase. We experimented with values around 35(%) based on findings from previous preliminary
+# unpublished work. Stance side variables are denoted 'ss':
 percent_ss_split = 39
 proportion_ss_split = percent_ss_split / 100
 frame_ss_split = int(np.round(proportion_ss_split * len_interp))
@@ -203,16 +203,16 @@ _ = None
 # Save the metadata:
 np.save('./Datasets/fi-b-rs/Objects/metadata_rs.npy', metadata_rs)
 
-# As was done for the benchmark datasets in the ForceID-Study-2 repo from Duncanson et al. (2024), make a trial names
-# object with unique trial identifiers. These identifiers must be unique across ForceID-B_RS and all benchmark datasets
-# to enable their integration for ML gait recognition experiments (data_analysis.py). The number of IDs across the
-# benchmark datasets n_ids_bm = 1050, so we redefine the ID labels in ForceID-B_RS to start from 1051:
+# As was done for the benchmark datasets in the ForceID-Study-2 repo for Duncanson et al. (2024), make a trial names
+# object with unique trial identifiers [2,3]. These identifiers must be unique across ForceID-B_RS and all benchmark
+# datasets to enable their integration for ML gait recognition experiments (data_analysis.py). The number of IDs across
+# the benchmark datasets n_ids_bm = 1050, so we redefine the ID labels in ForceID-B_RS to start from 1051:
 metadata_copy = metadata_rs.copy()
 metadata_copy[:, 1] = metadata_copy[:, 1] + n_ids_bm + 1
 
 # ForceID-A is denoted 'FI_...' in the trial names, whereas ForceID-B is denoted 'Fi_...'. Ideally, the nomenclature
 # would be revised to have a three letter dataset identifier or something, but we have kept it consistent with that used
-# in the ForceID-Study-2 repo for now:
+# in the ForceID-Study-2 repo for now [2]:
 trial_names = np.array(['_'.join(['Fi',
                                   format(el[1], '04d'),
                                   format(el[2], '02d'),

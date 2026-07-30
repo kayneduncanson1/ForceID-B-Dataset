@@ -267,7 +267,7 @@ class MyWindow(QMainWindow):
 
                     text_file.writelines(data_export)
 
-                # Notify the operator of successful initialization, reminding them of the object condition order if
+                # Notify the operator of successful initialisation, reminding them of the object condition order if
                 # applicable:
                 if self.Enter_BodyMass_Object.text() != 'NA':
 
@@ -286,7 +286,7 @@ class MyWindow(QMainWindow):
         # Get the datetime stamp of recording start:
         dt = datetime.now().strftime("%y_%m_%d-%H_%M_%S")
 
-        # Initialize the Vicon Datastream SDK client:
+        # Initialise the Vicon Datastream SDK client:
         client = ViconDataStream.Client()
 
         start = time.time()

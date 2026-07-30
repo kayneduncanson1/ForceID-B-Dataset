@@ -20,7 +20,7 @@ scale walking GRF datasets: AIST, Gutenberg, GaitRec and ForceID-A (referred her
 Specifically, ML models are developed (i.e., trained and validated) on data aggregated from the the benchmark datasets
 and then evaluated (i.e., tested) on ForceID-B_RS to infer the extent to which defining features of gait are common
 between reference data acquired in standard gait analysis contexts and ForceID-B. This script is based on main.py in the
-ForceID-Study-2 repo for Duncanson et al. (2024). Please refer to that script if additional information is required on
+ForceID-Study-2 repo for Duncanson et al. (2024) [2,3]. Please refer to that script if additional information is required on
 minor details such as string nomenclature."""
 
 # # -------------------------------------------------------------------------------------------------------------------
@@ -47,7 +47,7 @@ n_folds = 5
 
 # Specify the neural network architecture from the current set of options: '-----2F' and '3C1T-2F' (see Models module
 # for details):
-# Summary of architecture string nomenclature (see ForceID-Study-2 -- main.py for details)
+# Summary of architecture string nomenclature (see ForceID-Study-2 -- main.py for details) [2].
 # ----------------------------------------------------------------------------------------
 # Seven digit code specifying the number of layers of each type.
 # C = Convolutional layer
@@ -70,7 +70,7 @@ n_channels = 5
 # architecture with shared weights. The model takes two inputs and then conducts output feature level fusion using a
 # basic operation like addition or concatenation. There are a few operations to choose from by commenting/uncommenting
 # within the SiameseNet class in the Models module. This implementation is set up to include data from right and left
-# stance sides as the separate inputs as per Duncanson et al. (2021), but could easily be modified to use inputs of
+# stance sides as the separate inputs as per Duncanson et al. (2021) [8], but could easily be modified to use inputs of
 # different nature (e.g., FP1 and FP2) or extended to work with three+ independent inputs (e.g., Fx, Fy and Fz):
 single_network = True
 if single_network: # TODO: Debug for single_network = False.
@@ -223,7 +223,7 @@ else:
                     "loss function, please replace this Exception with its class initialisation.")
 
 # We use a custom method of similarity search to calculate loss and accuracy on validation and test sets ('random subset
-# search' (Duncanson et al., 2021; Duncanson et al., 2024):
+# search' [3,4]:
 criterion_eval = EvalHard(margin=m)
 
 # Specify whether to use cuda for training, validation and testing. We include this for flexible memory management:
@@ -399,7 +399,7 @@ for idx_fold in range(n_folds):
 
     # To search the feature space to generate predictions on validation and test sets, this study implemented a
     # difficult method proposed in Duncanson et al. (2023) that was later termed 'random subset search' in Duncanson
-    # et al. (2024). This method requires balanced validation and test sets with n samples per individual, where n is
+    # et al. (2024) [3,4]. This method requires balanced validation and test sets with n samples per individual, where n is
     # the minimum number of samples across all individuals (count_va_min and count_te_min here):
     count_va_min = np.min([len(id_subset) for id_subset in trial_names_by_id_folds_va[idx_fold]])
     trial_names_va = np.concatenate([id_subset[:count_va_min] for id_subset in trial_names_by_id_folds_va[idx_fold]])
