@@ -4,21 +4,54 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 from scipy.signal import decimate
 from scipy.interpolate import interp1d
-from PrePro import butterworth_lowpass
 from Utils import extract_base_metadata_fib
+from PrePro import butterworth_lowpass, normalise_grf_by_body_weight
+from Stats import extract_grf_features, aggregate_participant_features, participant_mass_map_from_fib_metadata,\
+    bootstrap_difference_and_g, print_feature_sign_diagnostics
 
-"""This script contributes to the data visualisation component of the technical validation by generating Figure 8 in the
-manuscript. The figure contains three columns of sub-plots:
+"""This script contributes to the technical validation by generating Figure 8/9 in the manuscript and performing
+statistical analysis on discrete GRF features.
+
+ Each figure contains three columns of sub-plots:
  1) Means and standard deviations of processed signals in four previous large-scale walking GRF datasets, referred
     herein as benchmark datasets (AIST, Gutenberg, GaitRec and ForceID-A). These signals are from complete foot
     contacts.
  2) Signals in ForceID-B_CFC processed as per the method demonstrated in data_processing.py. These signals are also
     from complete foot contacts.
- 3) A subset of ForceID-B containing signals from partial foot contacts for two random participants."""
+ 3) A subset of ForceID-B containing signals from partial foot contacts for two random participants.
+
+Figure 8 is in the absolute force scale whereas Figure 9 is in the body-weight-normalised force scale."""
 
 # # -------------------------------------------------------------------------------------------------------------------
 # # SECTION 1. INITIALISE PARAMETERS - START
 # # -------------------------------------------------------------------------------------------------------------------
+# When ``supp_analysis`` is False, this script generates Figure 8. When `supp_analysis`` is True, this script generates
+# Figure 9 and performs the statistical analysis. Namely, it extracts five pre-specified GRF features, summarises paired
+# right/left stance phases within trials, averages all available trial summaries within participant and outputs
+# participant-level mean differences and Hedges' g with bootstrap 95% confidence intervals:
+supp_analysis = False
+
+# Parameters used by the body-weight-normalised feature analysis:
+gravity = 9.80665  # m/s^2
+n_bootstrap = 10000
+bootstrap_seed = 42
+
+# Pre-specified windows on the time normalised stance phase. The time axis is 0-100% stance. Fz is positive upwards and
+# Fy is positive forwards in the foot biomechanical coordinate system used by data_processing.py:
+feature_specs = [
+    {"key": "Fz_first_peak", "label": "Fz first peak (5-35% stance)",
+     "channel": 2, "start_pct": 5.0, "end_pct": 35.0, "operation": "max"},
+    {"key": "Fz_midstance_trough", "label": "Fz midstance trough (35-65% stance)",
+     "channel": 2, "start_pct": 35.0, "end_pct": 65.0, "operation": "min"},
+    {"key": "Fz_second_peak", "label": "Fz second peak (65-95% stance)",
+     "channel": 2, "start_pct": 65.0, "end_pct": 95.0, "operation": "max"},
+    {"key": "Fy_braking_minimum", "label": "Fy braking minimum (0-50% stance)",
+     "channel": 1, "start_pct": 0.0, "end_pct": 50.0, "operation": "min"},
+    {"key": "Fy_propulsive_maximum", "label": "Fy propulsive maximum (50-100% stance)",
+     "channel": 1, "start_pct": 50.0, "end_pct": 100.0, "operation": "max"},
+]
+feature_keys = [spec["key"] for spec in feature_specs]
+
 # The code for part 3 is specifically set up for participant IDs 36 and 151 that were randomly sampled from the
 # dataset. It may need to be adapted (e.g., generalised) to work on other participants:
 ids_rand = [36, 151]
@@ -74,42 +107,50 @@ mpl.rcParams['mathtext.default'] = 'regular'
 
 
 # # -------------------------------------------------------------------------------------------------------------------
-# # SECTION 2. LOAD PROCESSED SIGNALS IN THE BENCHMARK ('BM') DATASETS - START
+# # SECTION 2. LOAD DATA AND METADATA FROM THE BENCHMARK ('BM') DATASETS - START
 # # -------------------------------------------------------------------------------------------------------------------
-sigs_bm_r = [] # r = right stance.
-sigs_bm_l = [] # l = left stance.
+names_bm = ['AIST', 'Gutenberg', 'GaitRec (healthy)', 'ForceID-A (private)']
+dirs_bm = ['ai-all', 'gb-all', 'gr-all', 'fi-all'] # Nomenclature from ForceID-Study-2 repo [2].
+sigs_bm_r = []
+sigs_bm_l = []
+sigs_bm_stance = []
+masses_bm = []
+labels_bm = []
 
-for dataset in ['ai-all', 'gb-all', 'gr-all', 'fi-all']: # Nomenclature from ForceID-Study-2 repo [2].
+for dataset in dirs_bm:
 
-    sigs_bm_r.append(np.load('./Datasets/%s/Objects/sigs_pro_r.npy' % dataset, allow_pickle=True))
-    sigs_bm_l.append(np.load('./Datasets/%s/Objects/sigs_pro_l.npy' % dataset, allow_pickle=True))
+    # Each row in the right/left arrays represents the two stance phases from the same trial, i.e., the signals can be
+    # paired before trial averaging.
+    sigs_r = np.asarray(np.load('./Datasets/%s/Objects/sigs_pro_r.npy' % dataset, allow_pickle=True), dtype=float)
+    sigs_l = np.asarray(np.load('./Datasets/%s/Objects/sigs_pro_l.npy' % dataset, allow_pickle=True), dtype=float)
+    # masses.npy and labels.npy are trial-level arrays aligned to the paired signal arrays.
+    masses = np.asarray(np.load('./Datasets/%s/Objects/masses.npy' % dataset, allow_pickle=True), dtype=float)
+    labels = np.asarray(np.load('./Datasets/%s/Objects/labels.npy' % dataset, allow_pickle=True))
 
-# Concatenate signals from each stance side:
-sigs_ai = np.concatenate((sigs_bm_r[0], sigs_bm_l[0]))
-sigs_gb = np.concatenate((sigs_bm_r[1], sigs_bm_l[1]))
-sigs_gr = np.concatenate((sigs_bm_r[2], sigs_bm_l[2]))
-sigs_fi = np.concatenate((sigs_bm_r[3], sigs_bm_l[3]))
+    sigs_bm_r.append(sigs_r)
+    sigs_bm_l.append(sigs_l)
+    sigs_bm_stance.append(np.concatenate((sigs_r, sigs_l)))
+    masses_bm.append(masses)
+    labels_bm.append(labels)
 # # -------------------------------------------------------------------------------------------------------------------
-# # SECTION 2. LOAD PROCESSED SIGNALS IN THE BENCHMARK ('BM') DATASETS - END
+# # SECTION 2. LOAD DATA AND METADATA FROM THE BENCHMARK ('BM') DATASETS - END
 # # -------------------------------------------------------------------------------------------------------------------
 
 
 # # -------------------------------------------------------------------------------------------------------------------
 # # SECTION 3. LOAD DATA AND METADATA FROM FORCEID-B_CFC - START
 # # -------------------------------------------------------------------------------------------------------------------
+# Paired left/right stance signal and metadata arrays were defined and saved in data_processing.py.
 sigs_fib_cfc_r = np.load('./Datasets/fi-b-cfc/Objects/sigs_pro_r.npy', allow_pickle=True)
 sigs_fib_cfc_l = np.load('./Datasets/fi-b-cfc/Objects/sigs_pro_l.npy', allow_pickle=True)
+metadata_fib_cfc = np.load('./Datasets/fi-b-cfc/Objects/metadata_cfc.npy', allow_pickle=True)
+id_labels_fib_cfc, ids_fib_cfc, counts_trials_by_id_fib_cfc, indices_where_id_changes_fib_cfc,\
+    ids_sessions_trials_fib_cfc, metadata_by_id_fib_cfc = extract_base_metadata_fib(metadata_fib_cfc)
 
 # Concatenate signals from each stance side:
-sigs_fib_cfc = np.concatenate((sigs_fib_cfc_r, sigs_fib_cfc_l))
-
-# Load the metadata array for the subset (that was defined and saved in data_processing.py):
-metadata_temp = np.load('./Datasets/fi-b-cfc/Objects/metadata_cfc.npy', allow_pickle=True)
-
-# The metadata array contains metadata on a per-trial basis. We need to repeat the array for each stance side so that
-# the signal and metadata objects match:
-metadata_fib_cfc = np.concatenate((metadata_temp, metadata_temp))
-id_labels_fib_cfc = metadata_fib_cfc[:, 1]
+sigs_fib_cfc_stance = np.concatenate((sigs_fib_cfc_r, sigs_fib_cfc_l))
+# Generate an ID label array that maps to the stance phase signal array:
+id_labels_fib_cfc_stance = np.concatenate((id_labels_fib_cfc, id_labels_fib_cfc))
 # # -------------------------------------------------------------------------------------------------------------------
 # # SECTION 3. LOAD DATA AND METADATA FROM FORCEID-B_CFC - END
 # # -------------------------------------------------------------------------------------------------------------------
@@ -192,7 +233,6 @@ sigs_pfc_raw = np.array(sigs_pfc_raw)
 metadata_pfc = np.array(metadata_pfc)
 
 # Set unneeded variables to None to save memory and simplify workspace:
-metadata_temp = None
 indices_id_labels_rand = None
 metadata_rand = None
 id_labels_rand = None
@@ -365,6 +405,10 @@ percent_fc_invalid = (count_fc_invalid / sigs_pfc_raw.shape[0]) * 100
 
 sigs_valid = np.array(sigs_valid)
 metadata_valid = np.array(metadata_valid)
+id_labels_valid = metadata_valid[:, 1]
+
+np.save('./Datasets/fi-b-pfc-valid/Objects/sigs_valid.npy', sigs_valid)
+np.save('./Datasets/fi-b-pfc-valid/Objects/metadata_valid.npy', metadata_valid)
 
 # Set unneeded variables to None to save memory and simplify workspace:
 sigs_pfc_raw = None
@@ -377,16 +421,132 @@ metadata_pfc = None
 
 
 # # -------------------------------------------------------------------------------------------------------------------
-# # SECTION 8. SAVE/LOAD THE 'VALID' SUBSET - START
+# # SECTION 8. NORMALISE GRF SIGNALS BY BODY WEIGHT AND CALCULATE FEATURE EFFECT SIZES - START
 # # -------------------------------------------------------------------------------------------------------------------
-# The 'valid' subset can be saved here and then re-loaded without having to run Sections 4-7 (i.e., these sections can
-# be commented):
-np.save('./Datasets/fi-b-pfc-valid/Objects/sigs_valid.npy', sigs_valid)
-np.save('./Datasets/fi-b-pfc-valid/Objects/metadata_valid.npy', metadata_valid)
-# sigs_valid = np.load('./Datasets/fi-b-pfc-valid/Objects/sigs_valid.npy', allow_pickle=True)
-# metadata_valid = np.load('./Datasets/fi-b-pfc-valid/Objects/metadata_valid.npy', allow_pickle=True)
+if supp_analysis:
+
+    # Create a participant-level body mass map for ForceID-B. Given that Metadata.csv is trial-level, repeated records
+    # within each session are averaged to collapse to individual session records. Then, session records are averaged
+    # to obtain a participant mean. Use body mass WITHOUT carried objects (metadata col index 7):
+    participant_mass_map = participant_mass_map_from_fib_metadata(metadata_fib)
+
+    # Use the body mass map to get body masses for participants in ForceID-B_CFC and the 'valid' partial contact subset:
+    masses_fib_cfc = np.asarray(
+        [participant_mass_map.get(str(pid)) for pid in id_labels_fib_cfc], dtype=float
+    )
+    masses_valid = np.asarray(
+        [participant_mass_map.get(str(pid)) for pid in id_labels_valid], dtype=float
+    )
+
+    # For the benchmark datasets, normalise GRFs to %BW then extract discrete features from Fy and Fz:
+    sigs_norm_bm_r = []
+    sigs_norm_bm_l = []
+    # Re-define the list of stance phase signal arrays from Section 2 to contain body-weight-normalised signals:
+    sigs_bm_stance = []
+    participant_features_by_dataset = {}
+    trial_features_by_dataset = {}
+    trial_counts_by_dataset = {}
+
+    for idx_ds in range(len(dirs_bm)):
+
+        sigs_norm_r = normalise_grf_by_body_weight(sigs_bm_r[idx_ds], masses_bm[idx_ds], gravity)
+        sigs_norm_l = normalise_grf_by_body_weight(sigs_bm_l[idx_ds], masses_bm[idx_ds], gravity)
+
+        sigs_norm_bm_r.append(sigs_norm_r)
+        sigs_norm_bm_l.append(sigs_norm_l)
+        sigs_bm_stance.append(np.concatenate((sigs_norm_r, sigs_norm_l)))
+
+        features_r = extract_grf_features(sigs_norm_r, feature_specs)
+        features_l = extract_grf_features(sigs_norm_l, feature_specs)
+        trial_features = (features_r + features_l) / 2.0
+        participant_features = aggregate_participant_features(trial_features, labels_bm[idx_ds], feature_keys)
+
+        participant_features_by_dataset[names_bm[idx_ds]] = participant_features
+        trial_features_by_dataset[names_bm[idx_ds]] = trial_features
+        trial_counts_by_dataset[names_bm[idx_ds]] = len(trial_features)
+
+        print_feature_sign_diagnostics(names_bm[idx_ds], trial_features, feature_keys)
+
+    # For ForceID-B_CFC and the 'valid' subset, normalise GRFs to %BW:
+    sigs_norm_fib_cfc_r = normalise_grf_by_body_weight(sigs_fib_cfc_r, masses_fib_cfc, gravity)
+    sigs_norm_fib_cfc_l = normalise_grf_by_body_weight(sigs_fib_cfc_l, masses_fib_cfc, gravity)
+    # Re-define the ForceID-B_CFC stance phase signal array from Section 3 to contain body-weight-normalised signals:
+    sigs_fib_cfc_stance = np.concatenate((sigs_norm_fib_cfc_r, sigs_norm_fib_cfc_l))
+    # Re-define the 'valid' stance phase signal array from Section 7 to contain body-weight-normalised signals:
+    sigs_valid = normalise_grf_by_body_weight(sigs_valid, masses_valid, gravity)
+
+    # For ForceID-B_CFC, extract discrete features from Fy and Fz for comparison with each benchmark dataset:
+    features_fib_cfc_r = extract_grf_features(sigs_norm_fib_cfc_r, feature_specs)
+    features_fib_cfc_l = extract_grf_features(sigs_norm_fib_cfc_l, feature_specs)
+    trial_features_fib_cfc = (features_fib_cfc_r + features_fib_cfc_l) / 2.0
+    participant_features_fib_cfc = aggregate_participant_features(
+        trial_features_fib_cfc,
+        id_labels_fib_cfc,
+        feature_keys,
+    )
+
+    trial_features_by_dataset['ForceID-B_CFC'] = trial_features_fib_cfc
+    trial_counts_by_dataset['ForceID-B_CFC'] = len(trial_features_fib_cfc)
+
+    print_feature_sign_diagnostics('ForceID-B_CFC', trial_features_fib_cfc, feature_keys)
+
+    # Record results in a CSV:
+    results = []
+    rng = np.random.default_rng(bootstrap_seed)
+
+    for name_bm in names_bm:
+
+        benchmark_participants = participant_features_by_dataset[name_bm]
+
+        for spec in feature_specs:
+
+            x = participant_features_fib_cfc[spec['key']].to_numpy(dtype=float)
+            y = benchmark_participants[spec['key']].to_numpy(dtype=float)
+
+            # Use an independently seeded stream per comparison/feature, while
+            # ensuring results are reproducible from the script parameters.
+            comparison_seed = int(rng.integers(0, np.iinfo(np.int32).max))
+            diff, diff_ci, g, g_ci = bootstrap_difference_and_g(
+                x, y, n_bootstrap, comparison_seed
+            )
+
+            results.append({
+                'Comparison': f'ForceID-B_CFC minus {name_bm}',
+                'Benchmark dataset': name_bm,
+                'Feature': spec['label'],
+                'Unit': '%BW',
+                'n ForceID-B participants': len(participant_features_fib_cfc),
+                'n benchmark participants': len(benchmark_participants),
+                'n ForceID-B trials': trial_counts_by_dataset['ForceID-B_CFC'],
+                'n benchmark trials': trial_counts_by_dataset[name_bm],
+                'ForceID-B participant mean (%BW)': float(np.mean(x)),
+                'ForceID-B participant SD (%BW)': float(np.std(x, ddof=1)),
+                'Benchmark participant mean (%BW)': float(np.mean(y)),
+                'Benchmark participant SD (%BW)': float(np.std(y, ddof=1)),
+                'Mean difference (%BW; B - benchmark)': diff,
+                'Mean difference 95% CI lower (%BW)': float(diff_ci[0]),
+                'Mean difference 95% CI upper (%BW)': float(diff_ci[1]),
+                "Hedges' g (B - benchmark)": g,
+                "Hedges' g 95% CI lower": float(g_ci[0]),
+                "Hedges' g 95% CI upper": float(g_ci[1]),
+            })
+
+    results_df = pd.DataFrame(results)
+    output_table = './Results/fig9_feature_effect_sizes.csv'
+    results_df.to_csv(output_table, index=False, float_format='%.5f')
+
+    print(f"Saved participant-level feature comparisons to {output_table}")
+
+    n_fib_sessions = len(set(zip(metadata_fib_cfc[:, 1].astype(str), metadata_fib_cfc[:, 2].astype(str))))
+
+    print("Feature analysis counts:")
+    print(f"  ForceID-B_CFC: {len(trial_features_fib_cfc)} bilateral trials, "
+          f"{len(participant_features_fib_cfc)} participants and {n_fib_sessions} sessions.")
+    for name_bm in names_bm:
+        print(f"  {name_bm}: {len(trial_features_by_dataset[name_bm])} bilateral trials and "
+              f"{len(participant_features_by_dataset[name_bm])} participants.")
 # # -------------------------------------------------------------------------------------------------------------------
-# # SECTION 8. SAVE/LOAD THE 'VALID' SUBSET - END
+# # SECTION 8. NORMALISE GRF SIGNALS BY BODY WEIGHT AND CALCULATE FEATURE EFFECT SIZES - END
 # # -------------------------------------------------------------------------------------------------------------------
 
 # # -------------------------------------------------------------------------------------------------------------------
@@ -416,14 +576,22 @@ for idx_col in range(n_cols):
         if idx_row == 0:
 
             ax.set_xticklabels([])
-            # The limits and ticks for y-axes were originally omitted and then hard-coded based on visual inspection of
-            # the figure. They may need to be revised for a different random subset of participants:
-            ax.set_ylim(-150, 150)
-            ax.set_yticks(np.arange(-150, 151, 50))
+
+            # Force axis limits are kept in the original absolute force scale in Figure 8 mode, and converted to %BW in
+            # Figure 9 (supplementary analysis) mode:
+            if supp_analysis:
+
+                ax.set_ylim(-21, 21)
+                ax.set_yticks(np.arange(-21, 22, 7))
+
+            else:
+
+                ax.set_ylim(-150, 150)
+                ax.set_yticks(np.arange(-150, 151, 50))
 
             if idx_col == 0:
 
-                ax.set_ylabel('$F_x$ (N)', size=11, style='italic')
+                ax.set_ylabel('$F_x$ (% BW)' if supp_analysis else '$F_x$ (N)', size=11, style='italic')
                 ax.set_title("Benchmark datasets\n(complete foot contacts)", size=11)
 
             elif idx_col == 1:
@@ -437,22 +605,38 @@ for idx_col in range(n_cols):
         elif idx_row == 1:
 
             ax.set_xticklabels([])
-            ax.set_ylim(-375, 375)
-            ax.set_yticks(np.arange(-375, 376, 125))
+
+            if supp_analysis:
+
+                ax.set_ylim(-45, 45)
+                ax.set_yticks(np.arange(-45, 46, 15))
+
+            else:
+
+                ax.set_ylim(-375, 375)
+                ax.set_yticks(np.arange(-375, 376, 125))
 
             if idx_col == 0:
 
-                ax.set_ylabel('$F_y$ (N)', size=11, style='italic')
+                ax.set_ylabel('$F_y$ (% BW)' if supp_analysis else '$F_y$ (N)', size=11, style='italic')
 
         elif idx_row == 2:
 
             ax.set_xticklabels([])
-            ax.set_ylim(0, 1500)
-            ax.set_yticks(np.arange(0, 1501, 250))
+
+            if supp_analysis:
+
+                ax.set_ylim(0, 180)
+                ax.set_yticks(np.arange(0, 181, 30))
+
+            else:
+
+                ax.set_ylim(0, 1500)
+                ax.set_yticks(np.arange(0, 1501, 250))
 
             if idx_col == 0:
 
-                ax.set_ylabel('$F_z$ (N)', size=11, style='italic')
+                ax.set_ylabel('$F_z$ (% BW)' if supp_analysis else '$F_z$ (N)', size=11, style='italic')
 
         elif idx_row == 3:
 
@@ -479,22 +663,20 @@ for idx_col in range(n_cols):
 
         axs.append(ax)
 
-sigs_bm = [sigs_ai, sigs_gb, sigs_gr, sigs_fi]
 colors = ['#C85200', '#5F9ED1', '#ABABAB', '#595959']
-plot_labels = ['AIST', 'Gutenberg', 'GaitRec (healthy)', 'ForceID-A (private)']
 
 # 1) Plot the mean and standard deviation of processed signals in each benchmark dataset:
-for ds in range(len(sigs_bm)):
+for ds in range(len(sigs_bm_stance)):
 
     for c in range(len(channels)):
 
-        mean = np.mean(sigs_bm[ds][:, c], axis=0)
-        std = np.std(sigs_bm[ds][:, c], axis=0)
+        mean = np.mean(sigs_bm_stance[ds][:, c], axis=0)
+        std = np.std(sigs_bm_stance[ds][:, c], axis=0)
 
         # Label the first subplot:
         if c == 0:
 
-            axs[c].plot(mean, lw=1, alpha=1, c=colors[ds], label=plot_labels[ds])
+            axs[c].plot(mean, lw=1, alpha=1, c=colors[ds], label=names_bm[ds])
 
         else:
 
@@ -513,9 +695,9 @@ color = 'lightgray'
 alpha = 0.8
 plot_label = 'Others'
 
-for idx, sig in enumerate(sigs_fib_cfc):
+for idx, sig in enumerate(sigs_fib_cfc_stance):
 
-    if id_labels_fib_cfc[idx] not in ids_rand:
+    if id_labels_fib_cfc_stance[idx] not in ids_rand:
 
         count += 1
 
@@ -538,9 +720,9 @@ color = '#006BA4'
 alpha = 1
 plot_label = 'ID %s' % ids_rand[0]
 
-for idx, sig in enumerate(sigs_fib_cfc):
+for idx, sig in enumerate(sigs_fib_cfc_stance):
 
-    if id_labels_fib_cfc[idx] == ids_rand[0]:  # ID 36 in the current implementation.
+    if id_labels_fib_cfc_stance[idx] == ids_rand[0]:  # ID 36 in the current implementation.
 
         count += 1
 
@@ -563,9 +745,9 @@ color = '#FF800E'
 alpha = 1
 plot_label = 'ID %s' % ids_rand[1]
 
-for idx, sig in enumerate(sigs_fib_cfc):
+for idx, sig in enumerate(sigs_fib_cfc_stance):
 
-    if id_labels_fib_cfc[idx] == ids_rand[1]:  # ID 151 in the current implementation.
+    if id_labels_fib_cfc_stance[idx] == ids_rand[1]:  # ID 151 in the current implementation.
 
         count += 1
 
@@ -586,8 +768,8 @@ for idx, sig in enumerate(sigs_fib_cfc):
 # Also plot the mean and standard deviation of each directional component/channel:
 for c in range(len(channels)):
 
-    mean = np.mean(sigs_fib_cfc[:, c], axis=0)
-    std = np.std(sigs_fib_cfc[:, c], axis=0)
+    mean = np.mean(sigs_fib_cfc_stance[:, c], axis=0)
+    std = np.std(sigs_fib_cfc_stance[:, c], axis=0)
 
     # Index axes 5-9 inclusive to plot in the middle column:
     axs[c + 5].plot(mean, lw=1, alpha=1, c='black')
@@ -595,8 +777,6 @@ for c in range(len(channels)):
     axs[c + 5].plot(mean + std, lw=1, alpha=1, c='black', ls='--')
 
 # 3) Plot processed signals in the 'valid' subset. This loop assumes that the subset contains two IDs:
-id_labels_valid = metadata_valid[:, 1]
-
 for idx, sig in enumerate(sigs_valid):
 
     for c in range(len(channels)):
@@ -626,7 +806,9 @@ for idx, sig in enumerate(sigs_valid):
 #               columnspacing=0.8)
 
 fig.supxlabel("Percent foot contact duration", size=11)
-plt.savefig('./Figures/fig 8 (sigs).pdf', dpi=1200)
+figure_path = './Figures/fig 9 (sigs BW).pdf' if supp_analysis else './Figures/fig 8 (sigs).pdf'
+plt.savefig(figure_path, dpi=1200)
+print(f"Saved figure to {figure_path}")
 # plt.show()
 # # -------------------------------------------------------------------------------------------------------------------
 # # SECTION 9. GENERATE THE FIGURE ACROSS THREE COLUMNS OF SUBPLOTS:

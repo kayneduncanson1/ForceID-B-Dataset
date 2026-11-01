@@ -5,21 +5,33 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="dd16f67a-7b80-4d90-9016-ade80575cf34" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Results/fig9_feature_effect_sizes.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Stats/__init__.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/STOP.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Scripts/data_acquisition_GUI.py" beforeDir="false" afterPath="$PROJECT_DIR$/Scripts/data_acquisition_GUI.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PrePro/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/PrePro/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Results/accloss_fiv-cro--_fi-all-gr-all-gb-all-ai-all-fi-b-rs_-----2F_512.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/Results/accloss_fiv-cro--_fi-all-gr-all-gb-all-ai-all-fi-b-rs_-----2F_512.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Results/accloss_fiv-cro--_fi-all-gr-all-gb-all-ai-all-fi-b-rs_3C1T-2F_512.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/Results/accloss_fiv-cro--_fi-all-gr-all-gb-all-ai-all-fi-b-rs_3C1T-2F_512.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Results/accs_te_fiv-cro--_fi-all-gr-all-gb-all-ai-all-fi-b-rs_-----2F_512.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Results/accs_te_fiv-cro--_fi-all-gr-all-gb-all-ai-all-fi-b-rs_-----2F_512.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Results/accs_te_fiv-cro--_fi-all-gr-all-gb-all-ai-all-fi-b-rs_3C1T-2F_512.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Results/accs_te_fiv-cro--_fi-all-gr-all-gb-all-ai-all-fi-b-rs_3C1T-2F_512.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Results/losses_te_fiv-cro--_fi-all-gr-all-gb-all-ai-all-fi-b-rs_-----2F_512.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Results/losses_te_fiv-cro--_fi-all-gr-all-gb-all-ai-all-fi-b-rs_-----2F_512.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Results/losses_te_fiv-cro--_fi-all-gr-all-gb-all-ai-all-fi-b-rs_3C1T-2F_512.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Results/losses_te_fiv-cro--_fi-all-gr-all-gb-all-ai-all-fi-b-rs_3C1T-2F_512.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Scripts/data_analysis.py" beforeDir="false" afterPath="$PROJECT_DIR$/Scripts/data_analysis.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Scripts/data_processing.py" beforeDir="false" afterPath="$PROJECT_DIR$/Scripts/data_processing.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Scripts/fig_demographics.py" beforeDir="false" afterPath="$PROJECT_DIR$/Scripts/fig_demographics.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Scripts/fig_sigs.py" beforeDir="false" afterPath="$PROJECT_DIR$/Scripts/fig_sigs.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/TrainEval/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/TrainEval/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Utils/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/Utils/__init__.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -44,11 +56,84 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="D:/Dataset paper/Manuscript/Revision/ForceID-B_revision_package/Author_review_notes.md" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
+  </component>
+  <component name="RunManager" selected="Python.fig_demographics">
+    <configuration name="data_analysis" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <module name="ForceID-B-Dataset" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="C:\Users\Kayne\anaconda3\envs\GaitReID\python.exe" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Scripts/data_analysis.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="true" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="fig_demographics" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <module name="ForceID-B-Dataset" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="C:\Users\Kayne\anaconda3\envs\GaitReID\python.exe" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Scripts/fig_demographics.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="true" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="fig_sigs" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <module name="ForceID-B-Dataset" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="C:\Users\Kayne\anaconda3\envs\GaitReID\python.exe" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Scripts/fig_sigs.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="true" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Python.data_analysis" />
+      <item itemvalue="Python.fig_sigs" />
+      <item itemvalue="Python.fig_demographics" />
+    </list>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -65,6 +150,43 @@
       <workItem from="1785194404642" duration="8461000" />
       <workItem from="1785278203985" duration="19716000" />
       <workItem from="1785367262450" duration="18750000" />
+      <workItem from="1785398538369" duration="277000" />
+      <workItem from="1785402516882" duration="231000" />
+      <workItem from="1786423427090" duration="2291000" />
+      <workItem from="1786869706647" duration="843000" />
+      <workItem from="1787635565238" duration="1612000" />
+      <workItem from="1787695085842" duration="10218000" />
+      <workItem from="1787793287943" duration="8520000" />
+      <workItem from="1788138716510" duration="638000" />
+      <workItem from="1790722639502" duration="14000" />
+      <workItem from="1791246865272" duration="72000" />
+      <workItem from="1791248103342" duration="604000" />
+      <workItem from="1791443792976" duration="904000" />
+      <workItem from="1791445015041" duration="554000" />
+      <workItem from="1791496598410" duration="2369000" />
+      <workItem from="1791510563767" duration="956000" />
+      <workItem from="1791584811674" duration="741000" />
+      <workItem from="1791669065419" duration="1899000" />
+      <workItem from="1791841080770" duration="15703000" />
+      <workItem from="1791873967453" duration="200000" />
+      <workItem from="1791926613208" duration="10990000" />
+      <workItem from="1792011810396" duration="5803000" />
+      <workItem from="1792103089939" duration="16425000" />
+      <workItem from="1792360606756" duration="3836000" />
+      <workItem from="1792449774345" duration="4096000" />
+      <workItem from="1792462113581" duration="7564000" />
+      <workItem from="1792526074422" duration="20037000" />
+      <workItem from="1792621421903" duration="23592000" />
+      <workItem from="1792705129642" duration="23886000" />
+      <workItem from="1792793767295" duration="5044000" />
+      <workItem from="1792968702250" duration="871000" />
+      <workItem from="1793045658845" duration="1712000" />
+      <workItem from="1793151957241" duration="214000" />
+      <workItem from="1793164888736" duration="730000" />
+      <workItem from="1793262155374" duration="1241000" />
+      <workItem from="1793357333207" duration="789000" />
+      <workItem from="1793379213155" duration="4716000" />
+      <workItem from="1793508705855" duration="1497000" />
     </task>
     <servers />
   </component>
@@ -81,5 +203,10 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/ForceID_B_Dataset$data_analysis.coverage" NAME="data_analysis Coverage Results" MODIFIED="1787796735417" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/ForceID_B_Dataset$fig_demographics.coverage" NAME="fig_demographics Coverage Results" MODIFIED="1793381974338" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/ForceID_B_Dataset$fig_sigs.coverage" NAME="fig_sigs Coverage Results" MODIFIED="1792802015353" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

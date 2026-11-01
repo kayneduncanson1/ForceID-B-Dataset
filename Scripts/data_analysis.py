@@ -20,8 +20,8 @@ scale walking GRF datasets: AIST, Gutenberg, GaitRec and ForceID-A (referred her
 Specifically, ML models are developed (i.e., trained and validated) on data aggregated from the the benchmark datasets
 and then evaluated (i.e., tested) on ForceID-B_RS to infer the extent to which defining features of gait are common
 between reference data acquired in standard gait analysis contexts and ForceID-B. This script is based on main.py in the
-ForceID-Study-2 repo for Duncanson et al. (2024) [2,3]. Please refer to that script if additional information is required on
-minor details such as string nomenclature."""
+ForceID-Study-2 repo for Duncanson et al. (2024) [2,3]. Please refer to that script if additional information is
+required on minor details such as string nomenclature."""
 
 # # -------------------------------------------------------------------------------------------------------------------
 # # SECTION 1. INITIALISE EXPERIMENTAL PARAMETERS AND MODEL HYPER-PARAMETERS - START
@@ -54,7 +54,7 @@ n_folds = 5
 # T = Transformer encoder layer
 # F = Fully-connected layer
 # ----------------------------------------------------------------------------------------
-arch = '-----2F'
+arch = '3C1T-2F'
 
 # Specify the fixed length of time normalised sequences based on the linear interpolation conducted in
 # data_processing.py. The value here must equal the value of the len_interp variable in data_processing.py:
@@ -585,7 +585,7 @@ for idx_fold in range(n_folds):
     accs_va = None
     losses_tr = None
     losses_va = None
-    mod_state_dict = None
+    mod_state_dict = None # TODO: Check mod_checks_folds after this to make sure that it doesn't contain None.
     opt_state_dict = None
 
     # Test the trained model:
@@ -638,9 +638,9 @@ for idx, result in enumerate([losses_tr_folds, losses_va_folds, losses_te_folds,
 
 # The checkpoints from cross-validation (model and optimiser states from each fold) aren't included in the list of
 # results to save because they are memory intensive. If desired, can save by uncommenting below:
-# torch.save(mod_checks_folds, os.path.join(results_path, 'mod_checks_%s_%s-%s-%s-%s-%s_%s_%s.pth' %
-#                                           (config_method, config[0], config[1], config[2], config[3], config[4],
-#                                            arch, bs)))
+torch.save(mod_checks_folds, os.path.join(results_path, 'mod_checks_%s_%s-%s-%s-%s-%s_%s_%s.pth' %
+                                          (config_method, config[0], config[1], config[2], config[3], config[4],
+                                           arch, bs)))
 # # -------------------------------------------------------------------------------------------------------------------
 # # SECTION 5. SAVE RESULTS - END
 # # -------------------------------------------------------------------------------------------------------------------

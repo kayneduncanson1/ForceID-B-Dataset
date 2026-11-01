@@ -30,7 +30,8 @@ metadata_fib = pd.read_csv('./Datasets/fi-b-all/Spreadsheets/Metadata.csv', usec
 id_labels_fib, ids_fib, counts_trials_by_id_fib, indices_where_id_changes_fib, ids_sessions_trials_fib,\
     metadata_by_id_fib = extract_base_metadata_fib(metadata_fib)
 
-# Get demographic attributes for each participant:
+# Get required metadata for each participant:
+sessions_by_id_fib = np.split(metadata_fib[:, 2], indices_where_id_changes_fib)
 ages_by_id_fib = np.split(metadata_fib[:, 4], indices_where_id_changes_fib)
 sexes_by_id_fib = np.split(metadata_fib[:, 5], indices_where_id_changes_fib)
 masses_by_id_fib = np.split(metadata_fib[:, 7], indices_where_id_changes_fib)
@@ -38,8 +39,9 @@ heights_by_id_fib = np.split(metadata_fib[:, 8], indices_where_id_changes_fib)
 
 # Get a representative value of each demographic attribute for each participant. Age, sex and height measurements are
 # from session 1 because these demographics were only measured in session 1 (values were duplicated across subsequent
-# session rows in the metadata spreadsheet). Body mass measurements are averaged. Height is nan for IDs 30 and 142,
-# whereas mass is nan for ID 142 session 1:
+# session rows in the metadata spreadsheet). For body mass, first collapse repeated trial records within each session
+# by taking the mean (the average of a set of identical values is equivalent to indexing a single value from
+# the set). Height is nan for IDs 30 and 142, whereas mass is nan for ID 142 session 1:
 idx_id_30 = np.asarray(ids_fib == 30).nonzero()[0][0]
 idx_id_142 = np.asarray(ids_fib == 142).nonzero()[0][0]
 
@@ -50,10 +52,15 @@ heights_fib = []
 
 for idx_id in range(ids_fib.shape[0]):
 
-    # Get entries for age, sex and mass. Include only non-nan mass values:
+    # Get age and sex entries, then collapse repeated body mass records within each session:
     ages_fib_subset = ages_by_id_fib[idx_id]
     sexes_fib_subset = sexes_by_id_fib[idx_id]
-    masses_fib_subset = masses_by_id_fib[idx_id][~np.isnan(masses_by_id_fib[idx_id].astype(float))]
+    masses_fib_sessions = pd.DataFrame({
+        'session': sessions_by_id_fib[idx_id],
+        'mass': masses_by_id_fib[idx_id].astype(float)
+    }).groupby('session', sort=False)['mass'].mean()
+    # Drop the session with nan mass measurement (ID 142 session 1):
+    masses_fib_subset = masses_fib_sessions.dropna().to_numpy()
 
     # Get age and sex measurements from the first session via index 0, as well as the average body mass rounded to one
     # decimal place:
@@ -81,7 +88,7 @@ sexes_fib = np.array(sexes_fib)
 masses_fib = np.array(masses_fib)
 heights_fib = np.array(heights_fib)
 
-# Convert sexes from string to binary:
+# Convert sexes from string to integer:
 indices_females_fib = np.asarray(sexes_fib == 'Female').nonzero()[0]
 indices_males_fib = np.asarray(sexes_fib == 'Male').nonzero()[0]
 sexes_fib[indices_females_fib] = 0
@@ -136,7 +143,7 @@ for dataset in ['fi-all', 'gr-all', 'gb-all', 'ai-all']:
 
     indices_where_id_changes = np.cumsum(counts_trials_by_id)[:-1]
 
-    # Get demographic measurements from session 1 for all but the first participant:
+    # To begin with, get demographic measurements for the second participant onwards:
     ages_by_id = []
     sexes_by_id = []
     masses_by_id = []
@@ -144,13 +151,14 @@ for dataset in ['fi-all', 'gr-all', 'gb-all', 'ai-all']:
 
     for idx in indices_where_id_changes:
 
-        # The measurement from session 1 can be found at the index where a participant's subset begins (i.e., idx):
+        # The demographic arrays contain participant-level values copied across trial indices, so we can get the value
+        # at the first index for each participant:
         ages_by_id.append(ages_temp[idx])
         sexes_by_id.append(sexes_temp[idx])
         masses_by_id.append(masses_temp[idx])
         heights_by_id.append(heights_temp[idx])
 
-    # Then include demographic measurements from session 1 for the first participant:
+    # Then, include demographic measurements for the first participant to form complete sets:
     ages = np.array([ages_temp[0]] + ages_by_id)
     sexes = np.array([sexes_temp[0]] + sexes_by_id)
     masses = np.array([masses_temp[0]] + masses_by_id)

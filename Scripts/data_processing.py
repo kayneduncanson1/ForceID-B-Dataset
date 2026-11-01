@@ -9,10 +9,10 @@ from PrePro import butterworth_lowpass
 from Utils import set_seed, extract_base_metadata_fib
 
 """This script defines and processes two subsets of ForceID-B:
-1) The ForceID-B_CFC subset contains trials with at least two complete foot contacts ('CFC'), wherein a sample was
-defined as the sequence of GRF and COP measurements over the first two complete foot contacts (i.e., complete gait
-cycle). In fig_sigs.py, this subset is visualised against another subset of ForceID-B containing partial foot contacts
-from two random IDs, as well as four previous large-scale walking GRF datasets referred herein as benchmark datasets:
+1) The ForceID-B_CFC subset contains trials with at least two consecutive complete foot contacts ('CFC'), wherein a
+sample was defined as the sequence of GRF and COP measurements over the first two consecutive stance phases.
+In fig_sigs.py, this subset is visualised against another subset of ForceID-B containing partial foot contacts from
+two random IDs, as well as four previous large-scale walking GRF datasets referred herein as benchmark datasets:
 AIST, Gutenberg, GaitRec and ForceID-A.
 2) The ForceID-B_RS subset contains two random samples ('RS') from each participant in ForceID-B_CFC with at least two
 samples. This subset is used in data_analysis.py, where it is 'pre-processed' further for Machine Learning (ML) and then

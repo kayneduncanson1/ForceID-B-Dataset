@@ -4,11 +4,11 @@
 
 [![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey.svg)](LICENSE.txt)
 [![Dataset DOI](https://img.shields.io/badge/Dataset-10.25909%2F33000368-blue.svg)](https://doi.org/10.25909/33000368)
-[![Code DOI](https://img.shields.io/badge/Code-10.5281%2Fzenodo.21446085-blue.svg)](https://doi.org/10.5281/zenodo.21446085)
+[![Code DOI](https://img.shields.io/badge/Code-10.5281%2Fzenodo.21446084-blue.svg)](https://doi.org/10.5281/zenodo.21446084)
 
 ## Overview
 
-ForceID-B is a large-scale walking ground reaction force (GRF) dataset acquired in a public university building under largely unconstrained field conditions. It contains 1,362 walking trials collected across 336 sessions from 173 healthy participants. Each trial contains three-dimensional GRF, three-dimensional ground reaction moment (GRM) and two-dimensional center-of-pressure (COP) measurements from three force platforms.
+ForceID-B is a walking ground reaction force (GRF) dataset acquired in a public university building with unconstrained foot placement and personal clothing, footwear and carried objects. The walking task and location were fixed, and participants were predominantly young adults. It contains 1,362 walking trials collected across 336 sessions from 173 healthy participants. Each trial contains three-dimensional GRF, three-dimensional ground reaction moment (GRM) and two-dimensional center-of-pressure (COP) measurements from three force platforms.
 
 The dataset captures natural intra- and inter-individual variation associated with repeated sessions, clothing, footwear, carried objects and unconstrained foot placement. Partial foot contacts comprise 65% of the annotated footsteps, making ForceID-B a challenging resource for developing, benchmarking and externally validating gait analysis methods intended for use beyond controlled laboratory settings.
 
@@ -22,6 +22,16 @@ This repository accompanies the ForceID-B Data Descriptor manuscript and provide
 
 > [!IMPORTANT]
 > The ForceID-B data records are distributed separately on [Figshare](https://doi.org/10.25909/33000368) <sup>[1](#ref-1)</sup>. The GitHub repository contains source code and selected supporting objects, not the 2.9 GB published dataset.
+
+## Manuscript revision notes
+
+The Data Descriptor is under revision at *Scientific Data*; it should not yet be described as accepted or published. This README describes the revised code set and should be committed together with the corresponding revised scripts and modules.
+
+- **Model checkpoint correction.** Best-validation model and optimiser state dictionaries are deep-copied in `TrainEval/__init__.py`, so subsequent training cannot overwrite the stored best state. Test evaluation reloads the selected checkpoint. Corrected convolutional transformer test accuracies across five folds are 88.24%, 85.88%, 91.76%, 85.29% and 88.82% (mean 88.00%, previously 88.94%). The fully-connected mean is 87.29%. The interpretation of cross-dataset recognition is unchanged.
+- **Demographic aggregation correction.** `Scripts/fig_demographics.py` gives each available session equal weight when calculating participant body mass. Regenerate Figure 4 and verify the ForceID-B body-mass summary before using the revised manuscript.
+- **Additional technical validation.** `Scripts/fig_sigs.py`, `PrePro/` and `Stats/` support body-weight-normalised Figure 9 and participant-level discrete GRF comparisons. The final manuscript figure has panel lettering and a legend post-processed in Adobe Illustrator.
+
+The data release and processed subsets are unchanged by these analysis corrections. The existing Zenodo archive reflects its archived code version; create a new code release/archive after committing the revisions and update version-specific citations accordingly.
 
 ## Repository objectives
 
@@ -46,9 +56,10 @@ The repository is a transparent research reference implementation rather than a 
 | `Figures/`     | Manuscript and accessory figures written by processing and figure scripts                                    |
 | `Losses/`      | Pairwise distance metric utilities, and implementation for evaluating ML model loss and accuracy             |
 | `Models/`      | Fully connected, convolutional-transformer and Siamese neural network definitions                            |
-| `PrePro/`      | Signal processing utility for bidirectional Butterworth low-pass filtering                                   |
+| `PrePro/`      | Bidirectional Butterworth low-pass filtering and GRF body weight normalisation                                   |
 | `Results/`     | Test set trial identifiers, cross-validation histories and model learning curve figures for ML experiments   |
 | `Scripts/`     | Modular scripts for the data acquisition, writing, processing, analysis and visualisation workflow           |
+| `Stats/` | Participant-level GRF feature summaries, body mass aggregation and bootstrap effect-size comparisons |
 | `TrainEval/`   | Model training, validation, testing and early stopping utilities                                             |
 | `Utils/`       | Reproducibility, serialisation, date-time and metadata loading utilities                                     |
 | `env.yaml`     | Conda environment export named `GaitReID`                                                                    |
@@ -70,6 +81,8 @@ ForceID-B-Dataset/
 ├── Models/
 │   └── __init__.py
 ├── PrePro/
+│   └── __init__.py
+├── Stats/
 │   └── __init__.py
 ├── TrainEval/
 │   └── __init__.py
@@ -164,7 +177,7 @@ flowchart TD
         CFC --> SIGS
         META --> SIGS
         RAW --> SIGS
-        SIGS --> FIG8["Figure 8 + raw PFC accessory figure"]
+        SIGS --> FIG8["Figures 8 and 9 + GRF feature comparisons + raw PFC accessory figure"]
         SIGS --> PFC["fi-b-pfc-valid NumPy objects"]
 
         BM --> DEMO["Scripts/fig_demographics.py"]
@@ -441,7 +454,7 @@ Files with a `.txt` suffix in `Results/` are binary Python pickle files written 
 
 ### `Scripts/fig_sigs.py`
 
-**Purpose.** Generates manuscript Figure 8 by comparing:
+**Purpose.** Generates manuscript Figures 8 and 9 and the participant-level GRF feature comparison table by comparing:
 
 1. means and standard deviations from the AIST, Gutenberg, GaitRec and ForceID-A benchmark datasets;
 2. processed complete foot contact signals from `ForceID-B_CFC`; and
@@ -449,13 +462,17 @@ Files with a `.txt` suffix in `Results/` are binary Python pickle files written 
 
 | Category                             | Details                                                                                      |
 |--------------------------------------|----------------------------------------------------------------------------------------------|
-| Benchmark inputs                     | `sigs_pro_r.npy` and `sigs_pro_l.npy` for `ai-all`, `gb-all`, `gr-all` and `fi-all`          |
+| Benchmark inputs                     | `sigs_pro_r.npy`, `sigs_pro_l.npy`, `masses.npy` and `labels.npy` for `ai-all`, `gb-all`, `gr-all` and `fi-all`          |
 | ForceID-B inputs                     | `metadata_cfc.npy`, CFC bilateral signal objects, `Metadata.csv` and raw GRF/COP CSV records |
 | ForceID-B random participant IDs     | `36` and `151` in the current implementation                                                 |
 | Minimum approximate contact duration | `200` frames                                                                                 |
 | Intermediate outputs                 | `Datasets/fi-b-pfc-valid/Objects/sigs_valid.npy` and `metadata_valid.npy`                    |
 | Accessory output                     | `Figures/ForceID-B_PFC_Fz_raw.pdf`                                                           |
-| Main output                          | `Figures/fig 8 (sigs).pdf`                                                                   |
+| Main outputs                         | `Figures/fig 8 (sigs).pdf`, `Figures/fig 9 (sigs BW).pdf`, `Results/fig9_feature_effect_sizes.csv`                                                                   |
+
+Set `supp_analysis = False` (the default) to generate Figure 8 in newtons. Set `supp_analysis = True` to generate Figure 9 with GRF components in percent body weight and the feature comparison CSV. COP remains in metres. The revised script requires both the updated `PrePro/__init__.py` and new `Stats/__init__.py`.
+
+Five discrete features are extracted in pre-specified stance windows. Paired right and left values are averaged within trials, then all trial summaries are averaged within participant. Independent participant bootstrap resampling (10,000 replicates; base seed 42) provides descriptive, unadjusted 95% confidence intervals for mean differences and Hedges' g. Differences are `ForceID-B_CFC minus benchmark`; these statistics are not tests of measurement equivalence. For every dataset, participant body mass is the mean of available session-level mass measurements, giving each session equal weight. ForceID-B uses mass without carried objects. Repeated trial rows within a session represent one measurement; the benchmark mass values were prepared using the same session-averaging method.
 
 The partial contact processing is intentionally less complete than the CFC pipeline: it does not apply trial-specific offset correction, stance side detection or mediolateral foot coordinate transformation. This reflects the technical validation comparison described in the manuscript.
 
@@ -471,6 +488,8 @@ The current plotting logic assumes exactly two selected participants, uses axis 
 | Benchmark inputs | NumPy objects: trial identifiers, participant labels, sample counts, ages, sexes, masses, heights, footwear categories and speed categories |
 | GaitRec option   | `gr-all` by default; `gr-sho` can be selected if compatible objects are supplied                                                            |
 | Output           | `Figures/fig 4 (demographics).pdf`                                                                                                          |
+
+For ForceID-B, the script first collapses repeated trial-level body mass values within each participant-session and then averages available session values with equal weight. It retains the original one-decimal rounding of participant mass and the original handling of age, sex and height.
 
 The script contains dataset-specific missing value and participant index handling. These assumptions must be reviewed when replacing benchmark versions or changing participant ordering.
 
@@ -804,7 +823,7 @@ Use the current citation metadata on the Figshare record:
 
 Use the version-specific or current citation metadata on the Zenodo record:
 
-- **ForceID-B-Dataset code:** <https://doi.org/10.5281/zenodo.21446085>
+- **ForceID-B-Dataset code:** <https://doi.org/10.5281/zenodo.21446084>
 
 See reference <sup>[9](#ref-9)</sup> for an example.
 
@@ -830,7 +849,7 @@ Repository contents are provided under the **Creative Commons Attribution-NonCom
 
 <a id="ref-8"></a>**8.** Duncanson, K. *et al.* The most discriminant components of force platform data for gait based person re-identification. *TechRxiv* <https://doi.org/10.36227/techrxiv.16683229.v1> (2021).
 
-<a id="ref-9"></a>**9.** Duncanson, K. A. *et al.* Source code for: ForceID-B – A diverse walking ground reaction force dataset acquired in a public indoor setting. *Zenodo* <https://doi.org/10.5281/zenodo.21446085> (2026).
+<a id="ref-9"></a>**9.** Duncanson, K. A. *et al.* Source code for: ForceID-B – A diverse walking ground reaction force dataset acquired in a public indoor setting. *Zenodo* <https://doi.org/10.5281/zenodo.21446084> (2026).
 
 ## Contact
 

@@ -1,3 +1,4 @@
+import copy
 import time
 import torch
 from Losses import get_dists
@@ -118,7 +119,8 @@ def train_val(mod, loader_tr, loader_va, labels_va, criterion_tr, criterion_eval
     acc_best_va = 0
 
     # Set a baseline checkpoint for model and optimiser states:
-    checkpoint = {'model_state_dict': mod.state_dict(), 'optimizer_state_dict': opt.state_dict()}
+    checkpoint = {'model_state_dict': copy.deepcopy(mod.state_dict()),
+                  'optimizer_state_dict': copy.deepcopy(opt.state_dict())}
 
     for epoch in range(1, epochs + 1):
 
@@ -347,7 +349,8 @@ def train_val(mod, loader_tr, loader_va, labels_va, criterion_tr, criterion_eval
 
                     # Save the states for the model and optimiser (i.e., parameter settings) that led to the highest
                     # validation accuracy:
-                    checkpoint = {'model_state_dict': mod.state_dict(), 'optimizer_state_dict': opt.state_dict()}
+                    checkpoint = {'model_state_dict': copy.deepcopy(mod.state_dict()),
+                                  'optimizer_state_dict': copy.deepcopy(opt.state_dict())}
 
         early_stopping(loss)
 
